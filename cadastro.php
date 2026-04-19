@@ -64,7 +64,6 @@ if (isset($_SESSION['usuario'])) {
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
         
-        // Sincroniza a sessão com o PHP
         const response = await fetch("session.php", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
