@@ -61,6 +61,14 @@ if (!isset($_SESSION['usuario'])) {
       font-size: 20px;
     }
 
+    .sidebar h3 {
+      color: #cbd5e1;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 6px;
+      margin-top: 24px;
+      font-size: 16px;
+    }
+
     .motorista-item {
       background: #1e293b;
       border-radius: 12px;
@@ -100,6 +108,10 @@ if (!isset($_SESSION['usuario'])) {
 
     .status-fadiga {
       color: #dc2626;
+    }
+
+    .status-offline {
+      color: #64748b;
     }
 
     .status-sem {
@@ -197,21 +209,29 @@ if (!isset($_SESSION['usuario'])) {
     .badge-normal { background: #16a34a; }
     .badge-atencao { background: #ca8a04; }
     .badge-fadiga { background: #dc2626; }
-    .badge-sem { background: #64748b; }
+    .badge-offline { background: #64748b; }
+    .badge-sem { background: #94a3b8; }
   </style>
 </head>
 <body>
   <div class="topo">
     <h1>Central de Monitoramento</h1>
     <div class="menu">
+      <a href="home.php">Início</a>
+      <a href="motoristas.php">Motoristas</a>
       <a href="logout.php">Sair</a>
     </div>
   </div>
 
   <div class="layout">
     <aside class="sidebar">
-      <h2>Motoristas em corrida</h2>
-      <div id="listaMotoristas"></div>
+      <h2>Central de motoristas</h2>
+
+      <h3>Em corrida</h3>
+      <div id="listaMotoristasAtivos"></div>
+
+      <h3>Offline</h3>
+      <div id="listaMotoristasOffline"></div>
     </aside>
 
     <main class="conteudo">
@@ -307,9 +327,9 @@ if (!isset($_SESSION['usuario'])) {
       getFirestore,
       collection,
       query,
-      where,
       onSnapshot,
       doc,
+      where,
       orderBy,
       limit
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -317,7 +337,8 @@ if (!isset($_SESSION['usuario'])) {
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const listaMotoristas = document.getElementById("listaMotoristas");
+    const listaMotoristasAtivos = document.getElementById("listaMotoristasAtivos");
+    const listaMotoristasOffline = document.getElementById("listaMotoristasOffline");
     const painelVazio = document.getElementById("painelVazio");
     const painelDetalhes = document.getElementById("painelDetalhes");
     const tabelaEventos = document.getElementById("tabelaEventos");
@@ -332,6 +353,7 @@ if (!isset($_SESSION['usuario'])) {
       if (status === "FADIGA") return "Fadiga";
       if (status === "NORMAL") return "Normal";
       if (status === "SEM ROSTO") return "Sem rosto";
+      if (status === "OFFLINE") return "Offline";
       return status || "--";
     }
 
@@ -339,6 +361,7 @@ if (!isset($_SESSION['usuario'])) {
       if (status === "NORMAL") return "status-normal";
       if (status === "ATENCAO") return "status-atencao";
       if (status === "FADIGA") return "status-fadiga";
+      if (status === "OFFLINE") return "status-offline";
       return "status-sem";
     }
 
@@ -346,10 +369,12 @@ if (!isset($_SESSION['usuario'])) {
       if (status === "NORMAL") return "badge badge-normal";
       if (status === "ATENCAO") return "badge badge-atencao";
       if (status === "FADIGA") return "badge badge-fadiga";
+      if (status === "OFFLINE") return "badge badge-offline";
       return "badge badge-sem";
     }
 
     function definirNivelRisco(nivelAlerta, status) {
+      if (status === "OFFLINE") return "Offline";
       if (status === "FADIGA" || nivelAlerta >= 2) return "Alto";
       if (status === "ATENCAO" || nivelAlerta === 1) return "Atenção";
       return "Normal";
@@ -379,9 +404,11 @@ if (!isset($_SESSION['usuario'])) {
       const riscoEl = document.getElementById("nivelRisco");
       riscoEl.innerText = nivelRisco;
       riscoEl.className = "";
+
       if (nivelRisco === "Normal") riscoEl.classList.add("status-normal");
       if (nivelRisco === "Atenção") riscoEl.classList.add("status-atencao");
       if (nivelRisco === "Alto") riscoEl.classList.add("status-fadiga");
+      if (nivelRisco === "Offline") riscoEl.classList.add("status-offline");
 
       document.getElementById("nivelAlerta").innerText = data.nivelAlerta ?? "--";
       document.getElementById("episodiosRecentes").innerText = data.episodiosRecentes ?? "--";
@@ -443,49 +470,91 @@ if (!isset($_SESSION['usuario'])) {
       const ref = doc(db, "monitoramento_atual", motoristaId);
 
       unsubscribeMotoristaSelecionado = onSnapshot(ref, (snapshot) => {
-        if (!snapshot.exists()) return;
+        if (!snapshot.exists()) {
+          renderizarPainel({
+            nome: "--",
+            placa: "--",
+            empresa: "--",
+            status: "OFFLINE",
+            nivelAlerta: 0,
+            episodiosRecentes: 0,
+            ear: 0,
+            perclos: 0,
+            bpm: 0,
+            duracaoMediaPiscada: 0,
+            atualizadoEm: null
+          });
+          return;
+        }
+
         renderizarPainel(snapshot.data());
       });
 
       carregarEventos(motoristaId);
     }
 
-    const q = query(
-      collection(db, "monitoramento_atual"),
-      where("emCorrida", "==", true)
-    );
+    const q = query(collection(db, "motoristas"));
 
     onSnapshot(q, (snapshot) => {
-      listaMotoristas.innerHTML = "";
+      listaMotoristasAtivos.innerHTML = "";
+      listaMotoristasOffline.innerHTML = "";
 
       if (snapshot.empty) {
-        listaMotoristas.innerHTML = "<p>Nenhum motorista ativo no momento.</p>";
+        listaMotoristasAtivos.innerHTML = "<p>Nenhum motorista cadastrado.</p>";
+        listaMotoristasOffline.innerHTML = "<p>Nenhum motorista cadastrado.</p>";
         return;
       }
 
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        const motoristaId = docSnap.id;
+      let primeiroMotoristaDisponivel = null;
+      let qtdAtivos = 0;
+      let qtdOffline = 0;
+
+      const docsOrdenados = [];
+      snapshot.forEach((docSnap) => docsOrdenados.push({ id: docSnap.id, ...docSnap.data() }));
+      docsOrdenados.sort((a, b) => (a.idMotorista || 0) - (b.idMotorista || 0));
+
+      docsOrdenados.forEach((data) => {
+        const motoristaId = data.motoristaId || data.id;
+
+        if (!primeiroMotoristaDisponivel) {
+          primeiroMotoristaDisponivel = motoristaId;
+        }
 
         const div = document.createElement("div");
         div.className = "motorista-item";
         div.id = "motorista-" + motoristaId;
 
+        const statusExibido = data.emCorrida ? "NORMAL" : "OFFLINE";
+
         div.innerHTML = `
           <strong>${data.nome ?? motoristaId}</strong>
           <div>Placa: ${data.placa ?? "--"}</div>
-          <div class="motorista-status ${classeStatus(data.status)}">
-            Status: ${textoStatus(data.status)}
+          <div class="motorista-status ${classeStatus(statusExibido)}">
+            Situação: ${data.emCorrida ? "Em corrida" : "Offline"}
           </div>
         `;
 
         div.addEventListener("click", () => selecionarMotorista(motoristaId));
 
-        listaMotoristas.appendChild(div);
+        if (data.emCorrida === true) {
+          listaMotoristasAtivos.appendChild(div);
+          qtdAtivos++;
+        } else {
+          listaMotoristasOffline.appendChild(div);
+          qtdOffline++;
+        }
       });
 
-      if (!motoristaSelecionadoId && !snapshot.empty) {
-        selecionarMotorista(snapshot.docs[0].id);
+      if (qtdAtivos === 0) {
+        listaMotoristasAtivos.innerHTML = "<p>Nenhum motorista em corrida.</p>";
+      }
+
+      if (qtdOffline === 0) {
+        listaMotoristasOffline.innerHTML = "<p>Nenhum motorista offline.</p>";
+      }
+
+      if (!motoristaSelecionadoId && primeiroMotoristaDisponivel) {
+        selecionarMotorista(primeiroMotoristaDisponivel);
       }
     });
   </script>

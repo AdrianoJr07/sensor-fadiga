@@ -71,7 +71,7 @@ if (isset($_SESSION['usuario'])) {
         });
 
         if (await response.text() === "ok") {
-          window.location.href = "dashboard.php";
+          window.location.href = "home.php";
         }
       } catch (error) {
         console.error(error);

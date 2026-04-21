@@ -132,7 +132,7 @@ if (isset($_SESSION['usuario'])) {
         const result = await response.text();
 
         if (result === "ok") {
-          window.location.href = "dashboard.php";
+          window.location.href = "home.php";
         } else {
           msg.innerText = "Erro ao iniciar sessão no PHP.";
         }
