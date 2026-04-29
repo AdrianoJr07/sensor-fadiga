@@ -13,209 +13,326 @@ if (!isset($_SESSION['usuario'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Central de Monitoramento</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #e2e8f0;
-      color: #0f172a;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #e2e8f0;
+  color: #0f172a;
+}
 
-    .topo {
-      background: #0f172a;
-      color: white;
-      padding: 18px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.topo {
+  background: linear-gradient(135deg, #020617, #0f172a, #1e3a8a);
+  color: white;
+  padding: 18px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+}
 
-    .topo h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+.topo h1 {
+  margin: 0;
+  font-size: 24px;
+}
 
-    .menu a {
-      color: white;
-      text-decoration: none;
-      margin-left: 16px;
-      font-weight: bold;
-    }
+.menu a {
+  color: #e2e8f0;
+  text-decoration: none;
+  margin-left: 18px;
+  font-weight: bold;
+}
 
-    .layout {
-      display: flex;
-      min-height: calc(100vh - 72px);
-    }
+.menu a:hover {
+  color: #38bdf8;
+}
 
-    .sidebar {
-      width: 320px;
-      background: #0f172a;
-      color: white;
-      padding: 20px;
-      overflow-y: auto;
-    }
+.container,
+.conteudo {
+  padding: 28px;
+}
 
-    .sidebar h2 {
-      margin-top: 0;
-      font-size: 20px;
-    }
+.box,
+.card,
+.tabela-box {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 6px 22px rgba(15, 23, 42, 0.10);
+}
 
-    .sidebar h3 {
-      color: #cbd5e1;
-      border-bottom: 1px solid #334155;
-      padding-bottom: 6px;
-      margin-top: 24px;
-      font-size: 16px;
-    }
+.card {
+  border-left: 5px solid #38bdf8;
+  transition: 0.2s;
+}
 
-    .motorista-item {
-      background: #1e293b;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: 0.2s;
-    }
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
+}
 
-    .motorista-item:hover {
-      background: #334155;
-    }
+.card h3 {
+  margin: 0 0 10px 0;
+  color: #64748b;
+  font-size: 15px;
+}
 
-    .motorista-item.ativo {
-      border-color: #60a5fa;
-    }
+.card p {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
 
-    .motorista-item strong {
-      display: block;
-      margin-bottom: 6px;
-    }
+button {
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    .motorista-status {
-      font-size: 13px;
-      margin-top: 6px;
-      font-weight: bold;
-    }
+button:hover {
+  filter: brightness(1.08);
+}
 
-    .status-normal {
-      color: #16a34a;
-    }
+input,
+select,
+button {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+}
 
-    .status-atencao {
-      color: #ca8a04;
-    }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 18px;
+}
 
-    .status-fadiga {
-      color: #dc2626;
-    }
+th,
+td {
+  padding: 13px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
 
-    .status-offline {
-      color: #64748b;
-    }
+th {
+  background: #f8fafc;
+  color: #334155;
+}
 
-    .status-sem {
-      color: #cbd5e1;
-    }
+tr:hover td {
+  background: #f8fafc;
+}
 
-    .conteudo {
-      flex: 1;
-      padding: 25px;
-    }
+.badge {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
 
-    .titulo-painel {
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
+.badge-ativo,
+.badge-normal {
+  background: #16a34a;
+}
 
-    .subinfo {
-      color: #475569;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
+.badge-inativo,
+.badge-offline {
+  background: #64748b;
+}
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-bottom: 24px;
-    }
+.badge-atencao {
+  background: #ca8a04;
+}
 
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    }
+.badge-fadiga {
+  background: #dc2626;
+}
 
-    .card h3 {
-      margin-top: 0;
-      font-size: 18px;
-      color: #334155;
-    }
+.status-normal {
+  color: #16a34a !important;
+}
 
-    .card p {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 0;
-    }
+.status-atencao {
+  color: #ca8a04 !important;
+}
 
-    .vazio {
-      color: #475569;
-      font-size: 18px;
-      padding: 20px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    }
+.status-fadiga {
+  color: #dc2626 !important;
+}
 
-    .tabela-box {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    }
+.status-offline {
+  color: #64748b !important;
+}
+.layout {
+  display: flex;
+  min-height: calc(100vh - 72px);
+}
 
-    .tabela-box h3 {
-      margin-top: 0;
-    }
+.sidebar {
+  width: 330px;
+  background: #0f172a;
+  color: white;
+  padding: 22px;
+  overflow-y: auto;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 21px;
+}
 
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #e2e8f0;
-      text-align: left;
-      font-size: 14px;
-    }
+.sidebar h3 {
+  color: #cbd5e1;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 7px;
+  margin-top: 26px;
+  font-size: 16px;
+}
 
-    th {
-      color: #334155;
-      background: #f8fafc;
-    }
+.motorista-item {
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 15px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: 0.2s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
 
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
-      color: white;
-    }
+.motorista-item:hover {
+  background: #334155;
+  transform: translateY(-2px);
+}
 
-    .badge-normal { background: #16a34a; }
-    .badge-atencao { background: #ca8a04; }
-    .badge-fadiga { background: #dc2626; }
-    .badge-offline { background: #64748b; }
-    .badge-sem { background: #94a3b8; }
+.motorista-item.ativo {
+  border-color: #60a5fa;
+  background: #1d4ed8;
+}
+
+.motorista-item strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+.motorista-status {
+  font-size: 13px;
+  margin-top: 7px;
+  font-weight: bold;
+}
+
+.conteudo {
+  flex: 1;
+  padding: 28px;
+}
+
+.titulo-painel {
+  margin: 0 0 6px 0;
+  font-size: 28px;
+}
+
+.subinfo {
+  color: #475569;
+  margin-bottom: 22px;
+  font-size: 14px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.status-card {
+  border-left-color: #2563eb;
+}
+
+.risco-card {
+  border-left-color: #f59e0b;
+}
+
+.alerta-card {
+  border-left-color: #dc2626;
+}
+
+.metric-card {
+  border-left-color: #38bdf8;
+}
+
+.status-box {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.status-box.status-normal {
+  background: #dcfce7;
+  color: #166534 !important;
+}
+
+.status-box.status-atencao {
+  background: #fef9c3;
+  color: #92400e !important;
+}
+
+.status-box.status-fadiga {
+  background: #fee2e2;
+  color: #991b1b !important;
+}
+
+.status-box.status-offline {
+  background: #e2e8f0;
+  color: #334155 !important;
+}
+
+.vazio {
+  color: #475569;
+  font-size: 18px;
+  padding: 22px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 6px 22px rgba(15, 23, 42, 0.10);
+}
+
+.tabela-box h3 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+.badge-sem {
+  background: #94a3b8;
+}
+
+.status-sem {
+  color: #94a3b8 !important;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+}
   </style>
 </head>
 <body>
   <div class="topo">
-    <h1>Central de Monitoramento</h1>
+    <h1>🌙 SonoSafe | Central de Monitoramento</h1>
     <div class="menu">
       <a href="home.php">Início</a>
       <a href="motoristas.php">Motoristas</a>
@@ -259,42 +376,42 @@ if (!isset($_SESSION['usuario'])) {
             <p id="empresaMotorista">--</p>
           </div>
 
-          <div class="card">
+          <div class="card status-card">
             <h3>Status atual</h3>
-            <p id="statusAtual">--</p>
+            <p><span id="statusAtual" class="status-box">--</span></p>
           </div>
 
-          <div class="card">
+          <div class="card risco-card">
             <h3>Nível de risco</h3>
             <p id="nivelRisco">--</p>
           </div>
 
-          <div class="card">
+          <div class="card alerta-card">
             <h3>Nível de alerta</h3>
             <p id="nivelAlerta">--</p>
           </div>
 
-          <div class="card">
+          <div class="card alerta-card">
             <h3>Episódios recentes</h3>
             <p id="episodiosRecentes">--</p>
           </div>
 
-          <div class="card">
-            <h3>EAR</h3>
+          <div class="card metric-card">
+            <h3>Abertura dos olhos</h3>
             <p id="ear">--</p>
           </div>
 
-          <div class="card">
-            <h3>PERCLOS</h3>
+          <div class="card metric-card">
+            <h3>Tempo com olhos fechados</h3>
             <p id="perclos">--</p>
           </div>
 
-          <div class="card">
+          <div class="card metric-card">
             <h3>Piscadas por minuto</h3>
             <p id="bpm">--</p>
           </div>
 
-          <div class="card">
+          <div class="card metric-card">
             <h3>Duração média da piscada</h3>
             <p id="duracaoMedia">--</p>
           </div>
@@ -357,6 +474,13 @@ if (!isset($_SESSION['usuario'])) {
       return status || "--";
     }
 
+    function textoEvento(tipo) {
+      if (tipo === "EPISODIO_FADIGA_CONFIRMADO") return "Fadiga confirmada";
+      if (tipo === "MUDANCA_STATUS") return "Mudança de status";
+      if (tipo === "MUDANCA_NIVEL_ALERTA") return "Mudança de alerta";
+      return tipo || "--";
+    }
+
     function classeStatus(status) {
       if (status === "NORMAL") return "status-normal";
       if (status === "ATENCAO") return "status-atencao";
@@ -398,7 +522,7 @@ if (!isset($_SESSION['usuario'])) {
 
       const statusAtual = document.getElementById("statusAtual");
       statusAtual.innerText = textoStatus(data.status);
-      statusAtual.className = classeStatus(data.status);
+      statusAtual.className = `status-box ${classeStatus(data.status)}`;
 
       const nivelRisco = definirNivelRisco(data.nivelAlerta ?? 0, data.status ?? "");
       const riscoEl = document.getElementById("nivelRisco");
@@ -443,7 +567,7 @@ if (!isset($_SESSION['usuario'])) {
 
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${data.tipo ?? "--"}</td>
+            <td>${textoEvento(data.tipo)}</td>
             <td><span class="${classeBadge(data.status)}">${textoStatus(data.status)}</span></td>
             <td>${data.nivelAlerta ?? "--"}</td>
             <td>${formatarHorario(data.criadoEm)}</td>

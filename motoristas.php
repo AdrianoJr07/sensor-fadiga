@@ -13,170 +13,173 @@ if (!isset($_SESSION['usuario'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Motoristas</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #e2e8f0;
-      color: #0f172a;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #e2e8f0;
+  color: #0f172a;
+}
 
-    .topo {
-      background: #0f172a;
-      color: white;
-      padding: 18px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.topo {
+  background: linear-gradient(135deg, #020617, #0f172a, #1e3a8a);
+  color: white;
+  padding: 18px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+}
 
-    .topo h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+.topo h1 {
+  margin: 0;
+  font-size: 24px;
+}
 
-    .menu a {
-      color: white;
-      text-decoration: none;
-      margin-left: 16px;
-      font-weight: bold;
-    }
+.menu a {
+  color: #e2e8f0;
+  text-decoration: none;
+  margin-left: 18px;
+  font-weight: bold;
+}
 
-    .container {
-      max-width: 1100px;
-      margin: 30px auto;
-      padding: 0 20px;
-    }
+.menu a:hover {
+  color: #38bdf8;
+}
 
-    .box {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      margin-bottom: 24px;
-    }
+.container,
+.conteudo {
+  padding: 28px;
+}
 
-    h2 {
-      margin-top: 0;
-    }
+.box,
+.card,
+.tabela-box {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 6px 22px rgba(15, 23, 42, 0.10);
+}
 
-    .acoes-topo {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+.card {
+  border-left: 5px solid #38bdf8;
+  transition: 0.2s;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-    }
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
+}
 
-    input, select, button {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
-      font-size: 15px;
-    }
+.card h3 {
+  margin: 0 0 10px 0;
+  color: #64748b;
+  font-size: 15px;
+}
 
-    button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.card p {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
 
-    button:hover {
-      background: #1d4ed8;
-    }
+button {
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    .btn-secundario {
-      background: #475569;
-    }
+button:hover {
+  filter: brightness(1.08);
+}
 
-    .btn-secundario:hover {
-      background: #334155;
-    }
+input,
+select,
+button {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+}
 
-    .btn-editar {
-      background: #ca8a04;
-    }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 18px;
+}
 
-    .btn-editar:hover {
-      background: #a16207;
-    }
+th,
+td {
+  padding: 13px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
 
-    .btn-excluir {
-      background: #dc2626;
-    }
+th {
+  background: #f8fafc;
+  color: #334155;
+}
 
-    .btn-excluir:hover {
-      background: #b91c1c;
-    }
+tr:hover td {
+  background: #f8fafc;
+}
 
-    .msg {
-      margin-top: 12px;
-      font-weight: bold;
-    }
+.badge {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 18px;
-    }
+.badge-ativo,
+.badge-normal {
+  background: #16a34a;
+}
 
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #e2e8f0;
-      text-align: left;
-    }
+.badge-inativo,
+.badge-offline {
+  background: #64748b;
+}
 
-    th {
-      background: #f8fafc;
-    }
+.badge-atencao {
+  background: #ca8a04;
+}
 
-    .acoes {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+.badge-fadiga {
+  background: #dc2626;
+}
 
-    .acoes button {
-      width: auto;
-      min-width: 90px;
-    }
+.status-normal {
+  color: #16a34a !important;
+}
 
-    #formBox {
-      display: none;
-    }
+.status-atencao {
+  color: #ca8a04 !important;
+}
 
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
-      color: white;
-    }
+.status-fadiga {
+  color: #dc2626 !important;
+}
 
-    .badge-ativo {
-      background: #16a34a;
-    }
+.status-offline {
+  color: #64748b !important;
+}
+#formBox {
+  display: none;
+}
 
-    .badge-inativo {
-      background: #64748b;
-    }
   </style>
 </head>
 <body>
   <div class="topo">
-    <h1>Gerenciamento de Motoristas</h1>
+    <h1>🌙 SonoSafe | Central de Monitoramento</h1>
     <div class="menu">
       <a href="home.php">Início</a>
       <a href="dashboard.php">Corridas</a>
@@ -188,7 +191,7 @@ if (!isset($_SESSION['usuario'])) {
     <div class="box">
       <div class="acoes-topo">
         <h2 style="margin:0;">Motoristas cadastrados</h2>
-        <button onclick="abrirFormularioNovo()" style="max-width:220px;">Novo motorista</button>
+        <button onclick="abrirFormularioNovo()" style="max-width:220px;">+ Novo motorista</button>
       </div>
 
       <div id="formBox">
@@ -301,71 +304,65 @@ if (!isset($_SESSION['usuario'])) {
     }
 
     window.salvarMotorista = async function () {
-      const docId = document.getElementById("docId").value;
-      const idMotoristaNumero = document.getElementById("idMotoristaNumero").value;
-      const nome = document.getElementById("nome").value.trim();
-      const empresa = document.getElementById("empresa").value.trim();
-      const placa = document.getElementById("placa").value.trim();
-      const ativo = document.getElementById("ativo").value === "true";
+  const docId = document.getElementById("docId").value;
+  const idMotoristaNumero = document.getElementById("idMotoristaNumero").value;
+  const nome = document.getElementById("nome").value.trim();
+  const empresa = document.getElementById("empresa").value.trim();
+  const placa = document.getElementById("placa").value.trim();
+  const ativo = document.getElementById("ativo").value === "true";
 
-      mensagem.innerText = "";
+  mensagem.innerText = "";
 
-      if (!nome || !empresa || !placa) {
-        mensagem.innerText = "Preencha todos os campos.";
-        return;
-      }
+  if (!nome || !empresa || !placa) {
+    mensagem.innerText = "Preencha todos os campos.";
+    return;
+  }
 
-      try {
-        let numeroId = idMotoristaNumero;
-        let motoristaId = "";
+  try {
+    let numeroId;
+    let motoristaId;
 
-        if (!docId) {
-          numeroId = await gerarProximoIdMotorista();
-        }
-
-        motoristaId = "motorista_" + numeroId;
-
-        const dados = {
-          idMotorista: Number(numeroId),
-          motoristaId,
-          nome,
-          empresa,
-          placa,
-          ativo,
-          emCorrida: false,
-          status: "OFFLINE",
-          atualizadoEm: serverTimestamp()
-        };
-
-        await setDoc(doc(db, "motoristas", motoristaId), dados, { merge: true });
-
-        await setDoc(doc(db, "monitoramento_atual", motoristaId), {
-          motoristaId,
-          nome,
-          empresa,
-          placa,
-          status: "OFFLINE",
-          ear: 0,
-          perclos: 0,
-          bpm: 0,
-          duracaoMediaPiscada: 0,
-          episodiosRecentes: 0,
-          nivelAlerta: 0,
-          emCorrida: false,
-          atualizadoEm: serverTimestamp()
-        }, { merge: true });
-
-        mensagem.innerText = docId
-          ? "Motorista atualizado com sucesso."
-          : "Motorista cadastrado com sucesso.";
-
-        limparFormulario();
-        formBox.style.display = "none";
-      } catch (error) {
-        console.error(error);
-        mensagem.innerText = "Erro ao salvar motorista.";
-      }
+    if (docId) {
+      // edição: mantém exatamente o mesmo documento
+      motoristaId = docId;
+      numeroId = Number(idMotoristaNumero || docId.replace("motorista_", ""));
+    } else {
+      // novo cadastro: gera novo ID
+      numeroId = await gerarProximoIdMotorista();
+      motoristaId = "motorista_" + numeroId;
     }
+
+    const dados = {
+      idMotorista: Number(numeroId),
+      motoristaId,
+      nome,
+      empresa,
+      placa,
+      ativo,
+      atualizadoEm: serverTimestamp()
+    };
+
+    await setDoc(doc(db, "motoristas", motoristaId), dados, { merge: true });
+
+    await setDoc(doc(db, "monitoramento_atual", motoristaId), {
+      motoristaId,
+      nome,
+      empresa,
+      placa,
+      atualizadoEm: serverTimestamp()
+    }, { merge: true });
+
+    mensagem.innerText = docId
+      ? "Motorista atualizado com sucesso."
+      : "Motorista cadastrado com sucesso.";
+
+    limparFormulario();
+    formBox.style.display = "none";
+  } catch (error) {
+    console.error(error);
+    mensagem.innerText = "Erro ao salvar motorista.";
+  }
+}
 
     window.editarMotorista = function (motoristaId, idMotorista, nome, empresa, placa, ativo) {
       document.getElementById("docId").value = motoristaId;
